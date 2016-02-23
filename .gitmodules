@@ -1,0 +1,3 @@
+[submodule "arcus-spring"]
+	path = arcus-spring
+	url = git@github.com:naver/arcus-spring.git
