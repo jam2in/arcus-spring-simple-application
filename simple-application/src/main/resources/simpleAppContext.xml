@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+       http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+    <cache:annotation-driven />
+    <context:property-placeholder location="/arcus.properties"/>
+
+    <bean id="arcusClient" class="com.navercorp.arcus.spring.ArcusClientFactoryBean">
+        <property name="url" value="${arcus.admin}"/>
+        <property name="serviceCode" value="${arcus.serviceCode}"/>
+        <property name="poolSize" value="${arcus.poolSize}"/>
+    </bean>
+
+    <bean id="operationTranscoderA" class="net.spy.memcached.transcoders.SerializingTranscoder">
+        <property name="charset" value="UTF-8" />
+        <property name="compressionThreshold" value="400" />
+    </bean>
+
+    <bean id="operationTranscoderB" class="net.spy.memcached.transcoders.SerializingTranscoder">
+        <property name="charset" value="UTF-8" />
+        <property name="compressionThreshold" value="1024" />
+    </bean>
+
+    <bean id="arcusKeyGenerator" class="com.navercorp.arcus.spring.cache.ArcusKeyGenerator"/>
+
+    <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+        <property name="caches">
+            <list>
+                <bean p:name="user" p:timeoutMilliSeconds="500" parent="defaultArcusCache"
+                      p:operationTranscoder-ref="operationTranscoderA" />
+                <bean p:name="article" p:expireSeconds="3000"	parent="defaultArcusCache"
+                      p:operationTranscoder-ref="operationTranscoderB" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultArcusCache" class="com.navercorp.arcus.spring.cache.ArcusCache"
+          p:arcusClient-ref="arcusClient" p:timeoutMilliSeconds="${arcus.optimeoutMilliseconds}"
+          p:expireSeconds="${arcus.expireSeconds}" abstract="true" p:serviceId="simpleApp-" />
+
+    <bean id="dbWrapper" class="com.jam2in.arcus.driver.DummyDBWrapper"/>
+</beans>
