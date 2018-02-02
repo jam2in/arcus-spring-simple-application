@@ -7,11 +7,22 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-@CacheConfig(cacheNames = "social")
+/*
+	<bean id="defaultArcusCache" class="com.navercorp.arcus.spring.cache.ArcusCache"
+		abstract="true">
+		...
+	</bean>
+
+	<bean id="socialArticleCache" parent="defaultArcusCache">
+		<property name="name" value="social"/>
+		...
+	</bean>
+ */
+@CacheConfig(cacheNames = "social") // socialArticleCache bean의 name
 @Service
 public class SocialArticleService {
 
 	@Autowired
-	private ArticleRepository articleRepository;
+	private ArticleRepository articleRepository; // DB
 
 }
