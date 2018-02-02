@@ -39,10 +39,9 @@ public class SportArticleService {
 /*
 		// @CachePut: sportArticleCache의 id(key)에 return 값을 삽입한다. //
 
-		ArcusCache sportArticleCache = simpleContext.getBean("sportArticleCache");
+		ArcusCache sportArticleCache = (ArcusCache) simpleContext.getBean("sportArticleCache");
 
-		Article article = articleRepository.update(article);
-		sportArticleCache.put(article.getId(), article);
+		sportArticleCache.put(article.getId(), articleRepository.update(article));
 */
 	}
 
@@ -54,10 +53,9 @@ public class SportArticleService {
 /*
 		// @CachePut: sportArticleCache의 id(key)에 return 값을 삽입한다. //
 
-		ArcusCache sportArticleCache = simpleContext.getBean("sportArticleCache");
+		ArcusCache sportArticleCache = (ArcusCache) simpleContext.getBean("sportArticleCache");
 
-		Article article = articleRepository.update(article);
-		sportArticleCache.put(article.getId(), article);
+		sportArticleCache.put(id, articleRepository.update(article));
 */
 	}
 
@@ -72,7 +70,7 @@ public class SportArticleService {
 /*
 		// @Cacheable: sportArticleCache에 id(key)가 없으면 return 값을 sportArticleCache의 id(key)에 삽입한다. //
 
-		ArcusCache sportArticleCache = simpleContext.getBean("sportArticleCache");
+		ArcusCache sportArticleCache = (ArcusCache) simpleContext.getBean("sportArticleCache");
 
 		ValueWrapper vw = sportArticleCache.get(id);
 		if (vw == null) {
@@ -86,17 +84,16 @@ public class SportArticleService {
 		return articleRepository.select(id);
 
 /*
-		// @Cacheable: key 속성이 없으면 getWithKeyGenerator 메소드의 파라미터들을 가지고 StringKeyGenerator에 의해 key를 생성한다. //
+		// @Cacheable, @CachePut, @CacheEvict: key 속성이 없으면 메소드의 파라미터들을 가지고 StringKeyGenerator에 의해 key를 생성한다. //
 
-		ArcusCache sportArticleCache = simpleContext.getBean("sportArticleCache");
-		StringKeyGenerator articleKeyGenerator = simpleContext.getBean("articleKeyGenerator");
+		ArcusCache sportArticleCache = (ArcusCache) simpleContext.getBean("sportArticleCache");
 
+		StringKeyGenerator articleKeyGenerator = (StringKeyGenerator) simpleContext.getBean("articleKeyGenerator");
 		ArcusStringKey arcusStringKey = articleKeyGenerator.generate(target, method, new Object[] {id, ...});
-		String key = sportArticheCache.createArcusKey(arcusStringKey);
 
-		ValueWrapper vw = sportArticleCache.get(key);
+		ValueWrapper vw = sportArticleCache.get(arcusStringKey);
 		if (vw == null) {
-			sportArticleCache.put(key, arcusRepository.select(id));
+			sportArticleCache.put(arcusStringKey, arcusRepository.select(id));
 		}
 */
 	}
@@ -112,10 +109,10 @@ public class SportArticleService {
 /*
 		// @CacheEvict:  sportArticleCache에 id(key)를 삭제한다. //
 
-		ArcusCache sportArticleCache = simpleContext.getBean("sportArticleCache");
+		ArcusCache sportArticleCache = (ArcusCache) simpleContext.getBean("sportArticleCache");
 
 		articleRepository.delete(id);
-		sportArticleCache.evict(Object key=id);
+		sportArticleCache.evict(id);
 */
 	}
 

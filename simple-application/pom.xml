@@ -27,7 +27,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>com.jam2in.arcus.tutorial.Main</mainClass>
+          <mainClass>com.jam2in.arcus.Main</mainClass>
         </configuration>
       </plugin>
     </plugins>
