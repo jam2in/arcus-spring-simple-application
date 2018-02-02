@@ -1,4 +1,4 @@
-package com.jam2in.arcus.tutorial.article;
+package com.jam2in.arcus.article;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;

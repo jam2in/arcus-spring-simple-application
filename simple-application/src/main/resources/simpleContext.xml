@@ -11,9 +11,9 @@
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context-4.2.xsd">
 
-    <context:property-placeholder location="tutorial.properties"/>
+    <context:property-placeholder location="simple.properties"/>
 
-    <context:component-scan base-package="com.jam2in.arcus.tutorial.article"/>
+    <context:component-scan base-package="com.jam2in.arcus.article"/>
 
     <bean id="arcusClient" class="com.navercorp.arcus.spring.ArcusClientFactoryBean">
       <property name="url" value="${arcus.admin}"/>
@@ -41,7 +41,7 @@
     	<property name="arcusClient" ref="arcusClient"/>
     	<property name="timeoutMilliSeconds" value="${arcus.optimeoutMilliseconds}"/>
         <property name="expireSeconds" value="${arcus.expireSeconds}"/>
-        <property name="serviceId" value="tutorial-"/>
+        <property name="serviceId" value="simple-"/>
         <property name="wantToGetException" value="true"/>
     </bean>
 
@@ -70,6 +70,6 @@
 
     <bean id="articleKeyGenerator" class="com.navercorp.arcus.spring.cache.StringKeyGenerator"/>
 
-    <bean id="articleCacheErrorHandler" class="com.jam2in.arcus.tutorial.article.ArticleCacheErrorHandler"/>
+    <bean id="articleCacheErrorHandler" class="com.jam2in.arcus.article.ArticleCacheErrorHandler"/>
 
 </beans>

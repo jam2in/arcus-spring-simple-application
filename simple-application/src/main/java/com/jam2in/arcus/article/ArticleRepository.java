@@ -1,4 +1,4 @@
-package com.jam2in.arcus.tutorial.article;
+package com.jam2in.arcus.article;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

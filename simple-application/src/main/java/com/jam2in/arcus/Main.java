@@ -1,16 +1,16 @@
-package com.jam2in.arcus.tutorial;
+package com.jam2in.arcus;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.jam2in.arcus.tutorial.article.Article;
-import com.jam2in.arcus.tutorial.article.SportArticleService;
+import com.jam2in.arcus.article.Article;
+import com.jam2in.arcus.article.SportArticleService;
 
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
 
-		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("tutorialContext.xml");
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("simpleContext.xml");
 
 		SportArticleService sportArticleService = (SportArticleService) applicationContext.getBean("sportArticleService");
 
