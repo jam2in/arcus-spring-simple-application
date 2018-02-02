@@ -82,11 +82,11 @@ public class SportArticleService {
 	}
 
 	@Cacheable
-	public Article getByKeyGenerator(int id) {
+	public Article getWithKeyGenerator(int id) {
 		return articleRepository.select(id);
 
 /*
-		// @Cacheable: key 속성이 없으면 getByKeyGenerator 메소드의 파라미터들을 가지고 StringKeyGenerator에 의해 key를 생성한다. //
+		// @Cacheable: key 속성이 없으면 getWithKeyGenerator 메소드의 파라미터들을 가지고 StringKeyGenerator에 의해 key를 생성한다. //
 
 		ArcusCache sportArticleCache = tutorialContext.getBean("sportArticleCache");
 		StringKeyGenerator articleKeyGenerator = tutorialContext.getBean("articleKeyGenerator");
