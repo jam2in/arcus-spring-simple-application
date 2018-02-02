@@ -4,11 +4,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:cache="http://www.springframework.org/schema/cache"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
-       http://www.springframework.org/schema/cache 
+       http://www.springframework.org/schema/cache
        http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
-       http://www.springframework.org/schema/context 
+       http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context-4.2.xsd">
 
     <context:property-placeholder location="tutorial.properties"/>
@@ -16,26 +16,26 @@
     <context:component-scan base-package="com.jam2in.arcus.tutorial.article"/>
 
     <bean id="arcusClient" class="com.navercorp.arcus.spring.ArcusClientFactoryBean">
-        <property name="url" value="${arcus.admin}"/>
-        <property name="serviceCode" value="${arcus.serviceCode}"/>
-        <property name="poolSize" value="${arcus.poolSize}"/>
+      <property name="url" value="${arcus.admin}"/>
+      <property name="serviceCode" value="${arcus.serviceCode}"/>
+      <property name="poolSize" value="${arcus.poolSize}"/>
     </bean>
 
     <bean id="operationTranscoderA" class="net.spy.memcached.transcoders.SerializingTranscoder">
-        <property name="charset" value="UTF-8" />
-        <property name="compressionThreshold" value="400" />
+      <property name="charset" value="UTF-8" />
+      <property name="compressionThreshold" value="400" />
     </bean>
 
     <bean id="operationTranscoderB" class="net.spy.memcached.transcoders.SerializingTranscoder">
-        <property name="charset" value="UTF-8" />
-        <property name="compressionThreshold" value="1024" />
+      <property name="charset" value="UTF-8" />
+      <property name="compressionThreshold" value="1024" />
     </bean>
-    
+
     <cache:annotation-driven
     	cache-manager="articleCacheManager"
     	key-generator="articleKeyGenerator"
     	error-handler="articleCacheErrorHandler"/>
-    
+
     <bean id="defaultArcusCache" class="com.navercorp.arcus.spring.cache.ArcusCache"
     	abstract="true">
     	<property name="arcusClient" ref="arcusClient"/>
@@ -44,34 +44,32 @@
         <property name="serviceId" value="tutorial-"/>
         <property name="wantToGetException" value="true"/>
     </bean>
-    
-    <bean id="sportArticleCache" 
-    	parent="defaultArcusCache">
-    	<property name="name" value="sportArticleCache"/>
-    	<property name="prefix" value="test1"/>
+
+    <bean id="sportArticleCache" parent="defaultArcusCache">
+    	<property name="name" value="sport"/>
+    	<property name="prefix" value="sportArticle"/>
     	<property name="timeoutMilliSeconds" value="500"/>
     	<property name="operationTranscoder" ref="operationTranscoderA"/>
    	</bean>
-   	
-    <bean id="socialArticleCache"
-    	parent="defaultArcusCache">
-    	<property name="name" value="socialArticleCache"/>
-    	<property name="prefix" value="test2"/>
+
+    <bean id="socialArticleCache" parent="defaultArcusCache">
+    	<property name="name" value="social"/>
+    	<property name="prefix" value="socialArticle"/>
     	<property name="expireSeconds" value="3000"/>
     	<property name="operationTranscoder" ref="operationTranscoderB"/>
    	</bean>
-    
+
     <bean id="articleCacheManager" class="org.springframework.cache.support.SimpleCacheManager">
         <property name="caches">
-            <list>
-            	<ref bean="sportArticleCache"/>
-            	<ref bean="socialArticleCache"/>
-            </list>
+          <list>
+          	<ref bean="sportArticleCache"/>
+          	<ref bean="socialArticleCache"/>
+          </list>
         </property>
     </bean>
-    
+
     <bean id="articleKeyGenerator" class="com.navercorp.arcus.spring.cache.StringKeyGenerator"/>
-    
+
     <bean id="articleCacheErrorHandler" class="com.jam2in.arcus.tutorial.article.ArticleCacheErrorHandler"/>
 
 </beans>
