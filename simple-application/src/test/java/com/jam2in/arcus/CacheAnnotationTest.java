@@ -59,7 +59,7 @@ public class CacheAnnotationTest {
     dbWrapper.getArticlesBetween("user2", 344L, 346L);
 
     dbWrapper.deleteArticle("user2", 234L);
-    assertThat(dbWrapper.getArticles("user2", 234L, 10).size(), is(0));
+    assertThat(dbWrapper.getArticles("user2", 234L, 10).size(), is(1));
     dbWrapper.deleteArticlesBetween("user2", 344L, 346L);
     assertThat(dbWrapper.getArticlesBetween("user2", 344L, 346L).size(), is(0));
     dbWrapper.deleteUser("user2");
