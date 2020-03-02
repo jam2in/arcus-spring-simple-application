@@ -28,7 +28,7 @@
         <property name="compressionThreshold" value="1024" />
     </bean>
 
-    <bean id="arcusKeyGenerator" class="com.navercorp.arcus.spring.cache.ArcusKeyGenerator"/>
+    <bean id="arcusKeyGenerator" class="com.navercorp.arcus.spring.cache.StringKeyGenerator"/>
 
     <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
         <property name="caches">
