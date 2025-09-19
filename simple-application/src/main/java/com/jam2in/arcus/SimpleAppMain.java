@@ -5,8 +5,12 @@ import com.jam2in.arcus.driver.DummyDBInterface;
 import com.jam2in.arcus.driver.DummyDBWrapper;
 import com.jam2in.arcus.rand.RandomActionGen;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,7 +27,6 @@ public class SimpleAppMain extends Thread {
 
     List<SimpleApp> appList = new ArrayList<SimpleApp>();
 
-    @Autowired
     private DummyDBInterface dbCli;
     private RandomActionGen actionGen;
     
@@ -42,8 +45,21 @@ public class SimpleAppMain extends Thread {
     public void getAppProperty(String[] args) {
         /* get Application property */
         try {
-            prop.load(new BufferedInputStream(new FileInputStream("/app.properties")));
-            
+            File app = new File("/app.properties");
+            if (!app.exists()) {
+                app = new File("src/main/resources/app.properties");
+            }
+
+            prop.load(new BufferedInputStream(new FileInputStream(app.getAbsolutePath())));
+
+            File xml = new File("/simpleAppContext.xml");
+            if (!xml.exists()) {
+                xml = new File("src/main/resources/simpleAppContext.xml");
+            }
+
+            ApplicationContext context = new FileSystemXmlApplicationContext("file:" + xml.getAbsolutePath());
+            this.dbCli = (DummyDBInterface) context.getBean("dbWrapper");
+
             /* don't consider wrong property
              * ex : ArcusAdmin=
              * ex : don't exist
@@ -56,6 +72,7 @@ public class SimpleAppMain extends Thread {
 
             USER_ARTICLE_SIZE = Integer.parseInt(prop.getProperty("UserArticleSize"));
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
             // FIXME : maybe java 7 or higher version... use multiple exception catch
             System.err.println("Application properties file don't exist.");
         } catch (IOException e) {
@@ -77,6 +94,53 @@ public class SimpleAppMain extends Thread {
         
         return true;
     }
+
+    public void startSimpleApp() throws IOException {
+        int numOfApp = this.getNumOfApp();
+        numOfApp = 1;
+
+        RandomActionGen actionGen = this.getRandomActionGen();
+
+        CountDownLatch latch = new CountDownLatch(numOfApp);
+        StatisticsPrinter statPrinter = new StatisticsPrinter(latch);
+
+        SimpleApp[] app = new SimpleApp[numOfApp];
+        Properties arcusProps = new Properties();
+        File arcus = new File("/arcus.properties");
+        if (!arcus.exists()) {
+            arcus = new File("src/main/resources/arcus.properties");
+        }
+
+        arcusProps.load(new BufferedInputStream(new FileInputStream(arcus.getAbsolutePath())));
+        ArcusClientWrapper arcusCli = new ArcusClientWrapper(
+            arcusProps.getProperty("arcus.admin"),
+            arcusProps.getProperty("arcus.serviceCode"),
+            Integer.parseInt(arcusProps.getProperty("arcus.expireSeconds")),
+            Long.parseLong(arcusProps.getProperty("arcus.optimeoutMilliseconds")),
+            Integer.parseInt(arcusProps.getProperty("arcus.optimeoutRetryCnt")),
+            Integer.parseInt(arcusProps.getProperty("arcus.poolSize"))
+        );
+        arcusCli.connect();
+
+        for (int i = 0; i < numOfApp; i++) {
+            app[i] = new SimpleApp(dbCli, arcusCli, actionGen, latch);
+            app[i].setName("SimpleApp " + (i + 1) + " thread");
+            statPrinter.setAppStats(app[i].getStatistics());
+        }
+
+        statPrinter.start();
+        for (int i = 0; i < numOfApp; i++) {
+            app[i].start();
+        }
+
+        for (int i = 0; i < numOfApp; i++) {
+            try {
+                app[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     
     public void finalConnections() {
         if (this.dbCli != null) {
@@ -97,7 +161,7 @@ public class SimpleAppMain extends Thread {
         return this.NUM_OF_APP;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         SimpleAppMain main = new SimpleAppMain();
         Runtime.getRuntime().addShutdownHook(main);
         
@@ -106,33 +170,7 @@ public class SimpleAppMain extends Thread {
             System.err.println("Can't start arcus simple application");
         } else {
             System.out.println("Start arcus simple application");
-            
-            int numOfApp = main.getNumOfApp();
-            
-            RandomActionGen actionGen = main.getRandomActionGen();
-            
-            CountDownLatch latch = new CountDownLatch(numOfApp);
-            StatisticsPrinter statPrinter = new StatisticsPrinter(latch);
-            
-            SimpleApp[] app = new SimpleApp[numOfApp];
-            for (int i = 0; i < numOfApp; i++) {
-                //app[i] = new SimpleApp(dbCli, arcusCli, actionGen, latch);
-                app[i].setName("SimpleApp " + (i + 1) + " thread");
-                //statPrinter.setAppStats(app[i].getStatistics());
-            }
-            
-            statPrinter.start();
-            for (int i = 0; i < numOfApp; i++) {
-                app[i].start();
-            }
-            
-            for (int i = 0; i < numOfApp; i++) {
-                try {
-                    app[i].join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            main.startSimpleApp();
         }
     }
 }

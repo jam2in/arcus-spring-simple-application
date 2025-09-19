@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
 
 import com.jam2in.arcus.driver.ArcusClientWrapper;
+import com.jam2in.arcus.driver.DummyDBInterface;
 import com.jam2in.arcus.driver.DummyDBWrapper;
 import com.jam2in.arcus.rand.AppAction;
 import com.jam2in.arcus.rand.RandomActionGen;
@@ -17,7 +18,7 @@ public class SimpleApp extends Thread {
     private boolean running = true; 
     
     private ArcusClientWrapper arcusCli;
-    private DummyDBWrapper dbCli;
+    private DummyDBInterface dbCli;
     
     private RandomDataGen dataGen;
     private RandomActionGen actionGen;
@@ -27,7 +28,7 @@ public class SimpleApp extends Thread {
     
     private CountDownLatch latch;
     
-    public SimpleApp(DummyDBWrapper d,
+    public SimpleApp(DummyDBInterface d,
                      ArcusClientWrapper a,
                      RandomActionGen c,
                      CountDownLatch l) {
